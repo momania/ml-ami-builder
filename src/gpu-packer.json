@@ -1,23 +1,19 @@
 {
   "variables": {
-    "region": "us-east-1",
-    "source_ami": "ami-d15a75c7",
-    "subnet_id": "subnet-7c882925",
-    "vpc_id": "vpc-a13ca6c4",
-    "aws_access_key": "",
-    "aws_secret_key": ""
+    "region": "eu-central-1",
+    "source_ami": "ami-bc4925d3",
+    "subnet_id": "subnet-1143de5c",
+    "vpc_id": " vpc-33f04858",
+    "instance_type": "t2.micro"
   },
   "builders": [
     {
       "type": "amazon-ebs",
-      "access_key": "{{user `aws_access_key`}}",
-      "secret_key": "{{user `aws_secret_key`}}",
       "region": "{{user `region`}}",
       "source_ami": "{{user `source_ami`}}",
       "ssh_username": "ubuntu",
-      "ami_name": "wyss-mlpe-docker-gpu-{{isotime \"2006-01-02T15:04:05Z\" | clean_ami_name}}",
-      "instance_type": "p3.2xlarge",
-      "enhanced_networking": true,
+      "ami_name": "docker-gpu-{{isotime \"2006-01-02T15:04:05Z\" | clean_ami_name}}",
+      "instance_type": "{{user `instance_type`}}",
       "subnet_id": "{{user `subnet_id`}}",
       "vpc_id": "{{user `vpc_id`}}",
       "launch_block_device_mappings": [{
@@ -67,13 +63,14 @@
     {
       "type": "shell",
       "script": "./install_nvidia_drivers.sh",
-      "execute_command": "{{ .Vars }} sudo -E bash '{{ .Path }}'"
+      "execute_command": "{{ .Vars }} sudo -E bash '{{ .Path }}'",
+      "expect_disconnect": true
     },
     {
       "type": "shell",
       "script": "./install_nvidia_docker.sh",
       "execute_command": "{{ .Vars }} sudo -E bash '{{ .Path }}'",
-      "pause_before": "10s"
+      "pause_before": "20s"
     },
     {
       "type": "shell",
